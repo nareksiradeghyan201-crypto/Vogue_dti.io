@@ -1,0 +1,1423 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VOGUE | Dress To Impress Roblox Edition</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts for High Fashion -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Cinzel:wght@400..900&family=Montserrat:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        vogueBlack: '#050505',
+                        vogueDarkCard: '#0d0d0f',
+                        vogueSilver: '#E2E8F0',
+                        vogueGlow: '#F8FAFC',
+                        vogueAccent: '#EC4899', // DTI Pink accent highlight
+                    },
+                    fontFamily: {
+                        serif: ['"Bodoni Moda"', 'serif'],
+                        cinzel: ['Cinzel', 'serif'],
+                        sans: ['Montserrat', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #050505;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+        .vogue-title {
+            font-family: 'Bodoni Moda', serif;
+            letter-spacing: 0.18em;
+        }
+        
+        /* Glassmorphism & Neon Silver Glow Effects */
+        .glass-card {
+            background: rgba(18, 18, 22, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+        .glass-card:hover {
+            border-color: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.12), 0 0 10px rgba(236, 72, 153, 0.2);
+        }
+        
+        /* Cinematic Spotlight Background */
+        .spotlight-bg {
+            background: radial-gradient(circle at 50% -20%, rgba(255, 255, 255, 0.15), rgba(5, 5, 5, 1) 70%);
+        }
+        .hero-glow {
+            box-shadow: 0 0 50px rgba(255, 255, 255, 0.15);
+        }
+        
+        /* Animated Light Streaks */
+        @keyframes streakAnimation {
+            0% { transform: translateX(-100%) rotate(45deg); }
+            100% { transform: translateX(300%) rotate(45deg); }
+        }
+        .shimmer-overlay::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 50%;
+            height: 200%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+            transform: rotate(45deg);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .shimmer-overlay:hover::after {
+            opacity: 1;
+            animation: streakAnimation 1.2s ease-in-out infinite;
+        }
+
+        /* Floating Particle Canvas */
+        #glitterCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Video Background with Mask Fade */
+        .bg-video-container {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+            pointer-events: none;
+        }
+        .bg-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(0.35) contrast(1.1);
+        }
+        .bg-video-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, #050505 0%, rgba(5,5,5,0.85) 35%, rgba(5,5,5,0.6) 70%, #050505 100%);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #050505;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #262626;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #525252;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased min-h-screen flex flex-col selection:bg-white selection:text-black spotlight-bg">
+
+    <!-- Video Background Layer -->
+    <div class="bg-video-container">
+        <video autoplay loop muted playsinline class="bg-video">
+            <source src="background.mp4" type="video/mp4">
+        </video>
+        <div class="bg-video-overlay"></div>
+    </div>
+
+    <!-- Interactive Background Glitter Canvas -->
+    <canvas id="glitterCanvas"></canvas>
+
+    <!-- MAIN HEADER & NAVIGATION -->
+    <header class="sticky top-0 z-40 bg-black/80 backdrop-blur-xl border-b border-white/10 transition-all duration-500">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-24">
+                
+                <!-- Admin Status / Unlock Button -->
+                <div class="flex items-center space-x-3">
+                    <button id="adminToggleBtn" onclick="openAdminModal()" class="flex items-center gap-2 px-4 py-2 text-xs tracking-widest uppercase font-semibold rounded-full border border-white/20 bg-white/5 hover:bg-white/15 hover:border-white transition duration-300 shadow-lg">
+                        <i class="fa-solid fa-key text-stone-300 text-sm"></i>
+                        <span id="adminBtnText">Editor-In-Chief Mode</span>
+                    </button>
+                    <span id="adminBadge" class="hidden px-2.5 py-0.5 text-[9px] uppercase tracking-widest bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 rounded-full font-bold animate-pulse">Access Granted</span>
+                </div>
+
+                <!-- VOGUE LOGO (Supports logo.png with fallback to Bodoni Serif Typography) -->
+                <div class="text-center group">
+                    <a href="javascript:void(0)" onclick="showSection('editorial')" class="inline-block">
+                        <img src="logo.png" alt="VOGUE" class="h-12 sm:h-16 w-auto mx-auto object-contain transition duration-500 group-hover:scale-105" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="hidden">
+                            <h1 class="vogue-title text-4xl sm:text-6xl md:text-7xl font-black text-white tracking-[0.25em] leading-none drop-shadow-[0_0_20px_rgba(255,255,255,0.4)] group-hover:scale-105 transition duration-500">VOGUE</h1>
+                            <span class="block text-[10px] uppercase tracking-[0.5em] text-stone-400 font-medium -mt-1 group-hover:text-vogueAccent transition duration-300">Roblox Dress To Impress</span>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="flex items-center space-x-4">
+                    <button onclick="showSection('application')" class="hidden sm:flex items-center gap-2 px-4 py-2 text-xs uppercase font-bold tracking-widest bg-white text-black rounded-full hover:bg-vogueAccent hover:text-white transition duration-300 shadow-xl">
+                        Apply Model
+                    </button>
+                    <button id="mobileMenuBtn" onclick="toggleMobileMenu()" class="md:hidden p-2 text-white hover:text-vogueAccent">
+                        <i class="fa-solid fa-bars text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- DESKTOP NAV LINKS -->
+            <nav class="hidden md:flex justify-center space-x-10 py-3 border-t border-white/10 text-xs tracking-[0.25em] font-semibold uppercase text-stone-400">
+                <button onclick="showSection('editorial')" id="nav-editorial" class="nav-link text-white font-bold border-b-2 border-white pb-1 transition duration-300">Editorial Covers</button>
+                <button onclick="showSection('runway')" id="nav-runway" class="nav-link hover:text-white transition duration-300">Runway Gallery</button>
+                <button onclick="showSection('application')" id="nav-application" class="nav-link hover:text-white transition duration-300">Model Application</button>
+                <button onclick="showSection('models')" id="nav-models" class="nav-link hover:text-white transition duration-300">Top Models Directory</button>
+            </nav>
+        </div>
+
+        <!-- MOBILE NAV MENU -->
+        <div id="mobileMenu" class="hidden md:hidden bg-stone-950/95 backdrop-blur-2xl border-b border-white/10 px-6 py-6 space-y-4 text-center text-xs tracking-widest uppercase font-semibold text-stone-300">
+            <button onclick="showSection('editorial'); toggleMobileMenu()" class="block w-full py-2 border-b border-white/5">Editorial Covers</button>
+            <button onclick="showSection('runway'); toggleMobileMenu()" class="block w-full py-2 border-b border-white/5">Runway Gallery</button>
+            <button onclick="showSection('application'); toggleMobileMenu()" class="block w-full py-2 border-b border-white/5">Model Application</button>
+            <button onclick="showSection('models'); toggleMobileMenu()" class="block w-full py-2">Top Models Directory</button>
+        </div>
+    </header>
+
+    <!-- ADMIN ACCESS BANNER (Visible when unlocked) -->
+    <div id="adminBanner" class="hidden bg-stone-900/90 backdrop-blur-md text-white py-3 px-6 border-b border-white/20 flex flex-wrap justify-between items-center gap-3 relative z-30">
+        <div class="flex items-center gap-3">
+            <span class="font-bold text-white text-xs uppercase tracking-widest">Editor-in-Chief Active</span>
+            <span class="hidden md:inline text-xs text-stone-400">| Standard Editor Rights Granted</span>
+        </div>
+        <div class="flex items-center gap-3">
+            <button onclick="openNewPostModal()" class="bg-white text-black font-extrabold px-4 py-1.5 rounded-full hover:bg-vogueAccent hover:text-white transition text-[11px] tracking-wider uppercase shadow-md flex items-center gap-1.5">
+                <i class="fa-solid fa-plus"></i> New Vogue Post
+            </button>
+            <button onclick="openAddModelModal()" class="bg-white/10 text-white hover:bg-white/20 font-bold px-4 py-1.5 rounded-full transition text-[11px] tracking-wider uppercase border border-white/20 flex items-center gap-1.5">
+                <i class="fa-solid fa-user-plus"></i> Add Model
+            </button>
+            <button onclick="openAddThemeModal()" class="bg-white/10 text-white hover:bg-white/20 font-bold px-4 py-1.5 rounded-full transition text-[11px] tracking-wider uppercase border border-white/20 flex items-center gap-1.5">
+                <i class="fa-solid fa-tags"></i> Add Theme
+            </button>
+            <button onclick="logoutAdmin()" class="bg-stone-800 hover:bg-stone-700 text-stone-300 px-3 py-1.5 rounded-full transition text-[11px] uppercase tracking-wider border border-white/10">
+                Lock Passcode
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="relative z-10 flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-16">
+
+        <!-- ================= SECTION 1: EDITORIAL / CINEMATIC FEED ================= -->
+        <section id="section-editorial" class="space-y-16">
+            
+            <!-- CINEMATIC FEATURED HERO SHOWCASE -->
+            <div id="heroCoverContainer" class="relative rounded-3xl overflow-hidden glass-card hero-glow border border-white/20 transition-all duration-700 shimmer-overlay">
+                <!-- Dynamic Content injected via JS -->
+            </div>
+
+            <!-- SECTION HEADER -->
+            <div class="flex flex-col sm:flex-row items-start sm:items-end justify-between border-b border-white/15 pb-6 gap-4">
+                <div>
+                    <span class="text-[10px] uppercase tracking-[0.4em] text-vogueAccent font-bold">Curated High Fashion Stories</span>
+                    <h2 class="vogue-title text-3xl sm:text-4xl font-bold tracking-widest text-white mt-1">Editorial Covers</h2>
+                </div>
+                
+                <div class="flex items-center gap-3">
+                    <span class="text-xs uppercase tracking-widest text-stone-400">Theme Filter:</span>
+                    <select id="editorialTagFilter" onchange="filterEditorialFeed()" class="bg-black/80 text-white border border-white/20 rounded-full px-4 py-2 text-xs uppercase tracking-wider focus:outline-none focus:border-white transition">
+                        <!-- Populated Dynamically -->
+                    </select>
+                </div>
+            </div>
+
+            <!-- EDITORIAL CARDS GRID -->
+            <div id="editorialGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Dynamically Rendered Cards -->
+            </div>
+        </section>
+
+        <!-- ================= SECTION 2: RUNWAY GALLERY ================= -->
+        <section id="section-runway" class="hidden space-y-12">
+            <div class="text-center max-w-3xl mx-auto space-y-3">
+                <span class="text-xs font-bold uppercase tracking-[0.4em] text-vogueAccent">5-Star Rated Outfits</span>
+                <h2 class="vogue-title text-4xl sm:text-5xl font-black uppercase tracking-widest text-white">The DTI Runway</h2>
+                <p class="text-xs uppercase tracking-widest text-stone-400">Explore immaculate styling and trending Roblox runway avatars.</p>
+            </div>
+
+            <!-- RUNWAY FILTERS -->
+            <div class="flex flex-wrap justify-center gap-3 py-3 border-y border-white/10" id="runwayFilters">
+                <!-- Dynamically Rendered Filters -->
+            </div>
+
+            <!-- RUNWAY GRID -->
+            <div id="runwayGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Dynamic Runway Cards -->
+            </div>
+        </section>
+
+        <!-- ================= SECTION 3: MODEL APPLICATION ================= -->
+        <section id="section-application" class="hidden space-y-8">
+            <div class="max-w-3xl mx-auto glass-card rounded-3xl p-8 sm:p-12 border border-white/20 shadow-2xl relative overflow-hidden">
+                <div class="text-center space-y-3 mb-10 border-b border-white/10 pb-8">
+                    <span class="text-xs uppercase tracking-[0.4em] font-extrabold text-vogueAccent">Walk The Virtual Catwalk</span>
+                    <h2 class="vogue-title text-3xl sm:text-5xl font-black uppercase tracking-wider text-white">Apply For Vogue DTI</h2>
+                    <p class="text-xs text-stone-400 max-w-md mx-auto uppercase tracking-widest">Submit your Roblox username and outfit screenshot. Featured models appear on our official magazine wall!</p>
+                </div>
+
+                <form id="modelAppForm" onsubmit="handleModelSubmit(event)" class="space-y-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-xs uppercase font-bold text-stone-300 tracking-wider mb-2">Roblox Username *</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-stone-500 font-bold">@</span>
+                                <input type="text" id="appUsername" required placeholder="GamerGirl_Vogue" class="w-full pl-9 pr-4 py-3 rounded-xl bg-black/80 border border-white/15 focus:outline-none focus:border-white text-white text-sm">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs uppercase font-bold text-stone-300 tracking-wider mb-2">Outfit Title *</label>
+                            <input type="text" id="appOutfitTitle" required placeholder="Midnight Velvet" class="w-full px-4 py-3 rounded-xl bg-black/80 border border-white/15 focus:outline-none focus:border-white text-white text-sm">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-xs uppercase font-bold text-stone-300 tracking-wider mb-2">Style Theme *</label>
+                            <select id="appTheme" required class="w-full px-4 py-3 rounded-xl bg-black/90 border border-white/15 focus:outline-none focus:border-white text-white text-sm">
+                                <!-- Dynamically Populated -->
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs uppercase font-bold text-stone-300 tracking-wider mb-2">Current DTI Rank *</label>
+                            <select id="appRank" required class="w-full px-4 py-3 rounded-xl bg-black/90 border border-white/15 focus:outline-none focus:border-white text-white text-sm">
+                                <option value="New Model">New Model</option>
+                                <option value="Rising Star">Rising Star</option>
+                                <option value="Aspiring Model">Aspiring Model</option>
+                                <option value="Fashionista">Fashionista</option>
+                                <option value="Glamourista">Glamourista</option>
+                                <option value="Fashion Maven">Fashion Maven</option>
+                                <option value="Runway Queen">Runway Queen</option>
+                                <option value="Trend Setter">Trend Setter</option>
+                                <option value="Runway Diva">Runway Diva</option>
+                                <option value="Top Model">Top Model</option>
+                                <option value="Glamour Elite">Glamour Elite</option>
+                                <option value="Fashion Mogul">Fashion Mogul</option>
+                                <option value="Supernova">Supernova</option>
+                                <option value="Fashion Goddess">Fashion Goddess</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- LOCAL FILE UPLOAD FOR MODEL APPLICATION -->
+                    <div>
+                        <label class="block text-xs uppercase font-bold text-stone-300 tracking-wider mb-2">Outfit Photo (Select from Phone / Files) *</label>
+                        <div class="relative flex flex-col items-center justify-center p-6 border-2 border-dashed border-white/20 hover:border-white rounded-2xl bg-black/50 transition cursor-pointer group" onclick="document.getElementById('appFileInput').click()">
+                            <i class="fa-solid fa-cloud-arrow-up text-3xl text-stone-400 group-hover:text-vogueAccent mb-2 transition"></i>
+                            <span id="appFileLabel" class="text-xs uppercase font-semibold text-stone-300 tracking-wider text-center">Tap to choose photo from gallery</span>
+                            <span class="text-[10px] text-stone-500 mt-1">Supports PNG, JPG, WEBP</span>
+                            <input type="file" id="appFileInput" accept="image/*" class="hidden" onchange="previewUploadedImage(this, 'appFileLabel', 'appPreviewImg', 'appPreviewContainer')">
+                        </div>
+                        <!-- Live Image Preview -->
+                        <div id="appPreviewContainer" class="hidden mt-3 text-center">
+                            <img id="appPreviewImg" src="" alt="Preview" class="h-44 w-auto mx-auto rounded-xl border border-white/30 object-cover shadow-lg">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs uppercase font-bold text-stone-300 tracking-wider mb-2">Model Statement / Bio</label>
+                        <textarea id="appBio" rows="3" placeholder="Describe the inspiration behind your high-fashion Roblox ensemble..." class="w-full px-4 py-3 rounded-xl bg-black/80 border border-white/15 focus:outline-none focus:border-white text-white text-sm"></textarea>
+                    </div>
+
+                    <button type="submit" id="appSubmitBtn" class="w-full bg-white text-black py-4 rounded-xl uppercase tracking-[0.25em] font-black text-xs hover:bg-vogueAccent hover:text-white transition duration-300 flex items-center justify-center gap-3 shadow-2xl">
+                        <i class="fa-solid fa-paper-plane"></i> Submit Model Application
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- ================= SECTION 4: TOP MODELS DIRECTORY ================= -->
+        <section id="section-models" class="hidden space-y-12">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end border-b border-white/15 pb-6 gap-4">
+                <div>
+                    <span class="text-xs font-bold uppercase tracking-[0.4em] text-vogueAccent">Iconic Roster</span>
+                    <h2 class="vogue-title text-3xl sm:text-4xl font-bold uppercase tracking-widest text-white">Top Models Directory</h2>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button id="addModelEditorBtn" onclick="openAddModelModal()" class="hidden bg-white text-black font-bold px-4 py-2 rounded-full text-xs uppercase tracking-wider hover:bg-vogueAccent hover:text-white transition">
+                        <i class="fa-solid fa-plus mr-1"></i> Add Verified Model
+                    </button>
+                    <div class="text-xs font-bold uppercase tracking-wider text-stone-300 bg-white/5 px-4 py-2 rounded-full border border-white/15">
+                        <span id="modelCountText">0 Models Enrolled</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODELS GRID -->
+            <div id="modelsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Dynamic Model Cards -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="relative z-10 bg-black border-t border-white/10 py-16 px-4 sm:px-6 lg:px-8 mt-24">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-10 text-center md:text-left">
+            <div>
+                <h2 class="vogue-title text-4xl sm:text-5xl font-black tracking-[0.2em] text-white">VOGUE</h2>
+                <p class="text-[10px] tracking-[0.4em] uppercase text-stone-400 mt-1 font-semibold">ROBLOX DRESS TO IMPRESS EDITION</p>
+            </div>
+            
+            <div class="flex flex-wrap justify-center gap-8 text-xs uppercase tracking-widest text-stone-400 font-semibold">
+                <a href="javascript:void(0)" onclick="showSection('editorial')" class="hover:text-white transition">Editorial</a>
+                <a href="javascript:void(0)" onclick="showSection('runway')" class="hover:text-white transition">Runway</a>
+                <a href="javascript:void(0)" onclick="showSection('application')" class="hover:text-white transition">Apply</a>
+                <a href="javascript:void(0)" onclick="openAdminModal()" class="hover:text-amber-300 transition flex items-center gap-1.5"><i class="fa-solid fa-key text-xs"></i> Passcode</a>
+            </div>
+
+            <div class="text-xs text-stone-500 font-mono">
+                © <span id="yearSpan"></span> VOGUE DTI. High Fashion Virtual Publication.
+            </div>
+        </div>
+    </footer>
+
+    <!-- ================= MODALS & NOTIFICATIONS ================= -->
+
+    <!-- ADMIN LOGIN PIN MODAL -->
+    <div id="adminPinModal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-stone-950 rounded-3xl max-w-md w-full p-8 border border-white/20 shadow-2xl relative text-white">
+            <button onclick="closeAdminModal()" class="absolute top-5 right-5 text-stone-400 hover:text-white">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+            <div class="text-center space-y-2 mb-6">
+                <div class="w-14 h-14 bg-white/10 text-stone-200 rounded-full flex items-center justify-center mx-auto text-2xl border border-white/20">
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                <h3 class="vogue-title text-2xl font-bold uppercase tracking-wider">Editor Access</h3>
+                <p class="text-xs text-stone-400">Enter creator passcode to unlock administrative privileges.</p>
+            </div>
+
+            <form onsubmit="handleAdminLogin(event)" class="space-y-4">
+                <div>
+                    <input type="password" id="adminPinInput" placeholder="Enter Passcode" required class="w-full px-4 py-3.5 rounded-xl bg-black border border-white/20 focus:outline-none focus:border-white text-center text-lg font-mono tracking-widest text-white">
+                </div>
+                <p id="pinError" class="hidden text-xs text-red-400 font-semibold text-center"></p>
+                <button type="submit" class="w-full bg-white text-black py-3.5 rounded-xl font-black text-xs uppercase tracking-[0.25em] hover:bg-vogueAccent hover:text-white transition">
+                    Unlock Editor Rights
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- NEW VERIFIED MODEL MODAL (Editor Only) -->
+    <div id="newModelModal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-stone-950 rounded-3xl max-w-xl w-full p-8 border border-white/20 shadow-2xl relative text-white max-h-[90vh] overflow-y-auto">
+            <button onclick="closeAddModelModal()" class="absolute top-5 right-5 text-stone-400 hover:text-white">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+            <div class="text-center space-y-1 mb-6">
+                <span class="text-[10px] uppercase font-bold tracking-widest text-vogueAccent bg-white/10 px-3 py-1 rounded-full border border-white/20">Editor-in-Chief</span>
+                <h3 class="vogue-title text-2xl font-bold uppercase tracking-wide">Add Verified Model</h3>
+                <p class="text-xs text-stone-400">Manually insert a verified model into the Top Models Directory.</p>
+            </div>
+
+            <form onsubmit="handleEditorAddModel(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs uppercase font-bold text-stone-300 mb-1">Roblox Username *</label>
+                    <input type="text" id="editorModelUsername" required placeholder="GamerGirl_Vogue" class="w-full px-4 py-2.5 bg-black border border-white/20 rounded-xl text-sm text-white">
+                </div>
+
+                <div>
+                    <label class="block text-xs uppercase font-bold text-stone-300 mb-1">Outfit Title *</label>
+                    <input type="text" id="editorModelOutfitTitle" required placeholder="Golden Gala Gown" class="w-full px-4 py-2.5 bg-black border border-white/20 rounded-xl text-sm text-white">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs uppercase font-bold text-stone-300 mb-1">Style Theme *</label>
+                        <select id="editorModelTheme" class="w-full px-4 py-2.5 bg-black border border-white/20 rounded-xl text-sm text-white">
+                            <!-- Populated Dynamically -->
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs uppercase font-bold text-stone-300 mb-1">DTI Rank / Title *</label>
+                        <select id="editorModelRank" class="w-full px-4 py-2.5 bg-black border border-white/20 rounded-xl text-sm text-white">
+                            <option value="New Model">New Model</option>
+                            <option value="Rising Star">Rising Star</option>
+                            <option value="Aspiring Model">Aspiring Model</option>
+                            <option value="Fashionista">Fashionista</option>
+                            <option value="Glamourista">Glamourista</option>
+                            <option value="Fashion Maven">Fashion Maven</option>
+                            <option value="Runway Queen">Runway Queen</option>
+                            <option value="Trend Setter">Trend Setter</option>
+                            <option value="Runway Diva">Runway Diva</option>
+                            <option value="Top Model">Top Model</option>
+                            <option value="Glamour Elite">Glamour Elite</option>
+                            <option value="Fashion Mogul">Fashion Mogul</option>
+                            <option value="Supernova">Supernova</option>
+                            <option value="Fashion Goddess">Fashion Goddess</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- MODEL FILE UPLOAD -->
+                <div>
+                    <label class="block text-xs uppercase font-bold text-stone-300 mb-1">Outfit Photo (Select from Phone / Files) *</label>
+                    <div class="relative flex flex-col items-center justify-center p-5 border-2 border-dashed border-white/20 hover:border-white rounded-xl bg-black/60 transition cursor-pointer group" onclick="document.getElementById('editorModelFileInput').click()">
+                        <i class="fa-solid fa-image text-2xl text-stone-400 group-hover:text-vogueAccent mb-1"></i>
+                        <span id="editorModelFileLabel" class="text-xs uppercase font-semibold text-stone-300">Tap to browse gallery</span>
+                        <input type="file" id="editorModelFileInput" accept="image/*" class="hidden" onchange="previewUploadedImage(this, 'editorModelFileLabel', 'editorModelPreviewImg', 'editorModelPreviewContainer')">
+                    </div>
+                    <div id="editorModelPreviewContainer" class="hidden mt-3 text-center">
+                        <img id="editorModelPreviewImg" src="" alt="Preview" class="h-44 w-auto mx-auto rounded-xl border border-white/30 object-cover shadow-lg">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs uppercase font-bold text-stone-300 mb-1">Model Statement / Bio</label>
+                    <textarea id="editorModelBio" rows="3" placeholder="Featured Top Model..." class="w-full px-4 py-2.5 bg-black border border-white/20 rounded-xl text-sm text-white"></textarea>
+                </div>
+
+                <button type="submit" class="w-full bg-white text-black py-3.5 rounded-xl font-black text-xs uppercase tracking-[0.2em] hover:bg-vogueAccent hover:text-white transition">
+                    Save Verified Model
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- NEW EDITORIAL POST MODAL (Admin Only) -->
+    <div id="newPostModal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-stone-950 rounded-3xl max-w-xl w-full p-8 border border-white/20 shadow-2xl relative text-white max-h-[90vh] overflow-y-auto">
+            <button onclick="closeNewPostModal()" class="absolute top-5 right-5 text-stone-400 hover:text-white">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+            <div class="text-center space-y-1 mb-6">
+                <span class="text-[10px] uppercase font-bold tracking-widest text-amber-300 bg-white/10 px-3 py-1 rounded-full border border-amber-300/30">Editor-in-Chief</span>
+                <h3 class="vogue-title text-2xl font-bold uppercase tracking-wide">Publish Vogue Cover</h3>
+                <p class="text-xs text-stone-400">Upload screenshot directly from your phone gallery or computer.</p>
+            </div>
+
+            <form onsubmit="handleCreatePost(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs uppercase font-bold text-stone-300 mb-1">Post Title *</label>
+                    <input type="text" id="postTitle" required placeholder="E.g., MET GALA: CELESTIAL GLAMOUR" class="w-full px-4 py-2.5 bg-black border border-white/20 rounded-xl text-sm text-white">
+                </div>
+
+                <div>
+                    <label class="block text-xs uppercase font-bold text-stone-300 mb-1">Styled By / Subtitle *</label>
+                    <input type="text" id="postSubtitle" required placeholder="E.g., Styled by @VogueQueen_Roblox" class="w-full px-4 py-2.5 bg-black border border-white/20 rounded-xl text-sm text-white">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs uppercase font-bold text-stone-300 mb-1">Tag / Category *</label>
+                        <select id="postTag" class="w-full px-4 py-2.5 bg-black border border-white/20 rounded-xl text-sm text-white">
+                            <!-- Populated Dynamically -->
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs uppercase font-bold text-stone-300 mb-1">Set as Main Hero Banner?</label>
+                        <select id="postIsHero" class="w-full px-4 py-2.5 bg-black border border-white/20 rounded-xl text-sm text-white">
+                            <option value="false">Standard Grid Cover</option>
+                            <option value="true">Main Hero Cover</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- LOCAL FILE UPLOAD FOR EDITOR POST -->
+                <div>
+                    <label class="block text-xs uppercase font-bold text-stone-300 mb-1">Select Outfit Photo (Phone Gallery / Files) *</label>
+                    <div class="relative flex flex-col items-center justify-center p-5 border-2 border-dashed border-white/20 hover:border-white rounded-xl bg-black/60 transition cursor-pointer group" onclick="document.getElementById('postFileInput').click()">
+                        <i class="fa-solid fa-image text-2xl text-stone-400 group-hover:text-vogueAccent mb-1"></i>
+                        <span id="postFileLabel" class="text-xs uppercase font-semibold text-stone-300">Tap to browse gallery</span>
+                        <input type="file" id="postFileInput" accept="image/*" class="hidden" onchange="previewUploadedImage(this, 'postFileLabel', 'postPreviewImg', 'postPreviewContainer')">
+                    </div>
+                    <div id="postPreviewContainer" class="hidden mt-3 text-center">
+                        <img id="postPreviewImg" src="" alt="Preview" class="h-44 w-auto mx-auto rounded-xl border border-white/30 object-cover shadow-lg">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs uppercase font-bold text-stone-300 mb-1">Caption / Story</label>
+                    <textarea id="postCaption" rows="3" placeholder="Vogue editorial analysis of the Roblox outfit..." class="w-full px-4 py-2.5 bg-black border border-white/20 rounded-xl text-sm text-white"></textarea>
+                </div>
+
+                <button type="submit" class="w-full bg-white text-black py-3.5 rounded-xl font-black text-xs uppercase tracking-[0.2em] hover:bg-vogueAccent hover:text-white transition">
+                    Publish To Vogue DTI
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ADD NEW THEME MODAL (Admin Only) -->
+    <div id="newThemeModal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-stone-950 rounded-3xl max-w-md w-full p-8 border border-white/20 shadow-2xl relative text-white">
+            <button onclick="closeAddThemeModal()" class="absolute top-5 right-5 text-stone-400 hover:text-white">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+            <div class="text-center space-y-1 mb-6">
+                <span class="text-[10px] uppercase font-bold tracking-widest text-vogueAccent bg-white/10 px-3 py-1 rounded-full border border-white/20">Editor-in-Chief</span>
+                <h3 class="vogue-title text-2xl font-bold uppercase tracking-wide">Add New Theme</h3>
+                <p class="text-xs text-stone-400">Create a custom style category/tag for Vogue filters and posts.</p>
+            </div>
+
+            <form onsubmit="handleCreateTheme(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs uppercase font-bold text-stone-300 mb-1">Theme Name *</label>
+                    <input type="text" id="newThemeInput" required placeholder="E.g., Vintage Coquette, Y2K Cyber" class="w-full px-4 py-3 bg-black border border-white/20 rounded-xl text-sm text-white focus:outline-none focus:border-white">
+                </div>
+                <button type="submit" class="w-full bg-white text-black py-3.5 rounded-xl font-black text-xs uppercase tracking-[0.2em] hover:bg-vogueAccent hover:text-white transition">
+                    Save Theme Category
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- FULL-SCREEN EDITORIAL COVER LIGHTBOX MODAL -->
+    <div id="coverLightboxModal" class="hidden fixed inset-0 z-50 bg-black/95 backdrop-blur-2xl flex items-center justify-center p-4 overflow-y-auto">
+        <div class="glass-card rounded-3xl max-w-5xl w-full border border-white/20 shadow-2xl relative overflow-hidden my-auto text-white">
+            <button onclick="closeCoverLightbox()" class="absolute top-5 right-5 z-20 w-10 h-10 bg-black/70 hover:bg-white hover:text-black rounded-full flex items-center justify-center transition border border-white/20">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <div class="grid grid-cols-1 lg:grid-cols-12 min-h-[550px]">
+                <div class="lg:col-span-7 relative bg-black flex items-center justify-center overflow-hidden min-h-[350px] lg:min-h-[550px]">
+                    <img id="lightboxImg" src="" alt="Vogue Cover" class="w-full h-full object-contain max-h-[85vh]">
+                </div>
+                <div class="lg:col-span-5 p-8 sm:p-10 flex flex-col justify-between space-y-6 bg-gradient-to-b lg:bg-gradient-to-r from-stone-950 to-black border-t lg:border-t-0 lg:border-l border-white/10">
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-3">
+                            <span id="lightboxTag" class="px-3.5 py-1 bg-vogueAccent/20 text-vogueAccent border border-vogueAccent/40 rounded-full text-[10px] font-bold uppercase tracking-widest">Tag</span>
+                            <span id="lightboxDate" class="text-stone-400 text-xs font-mono">Date</span>
+                        </div>
+                        <h2 id="lightboxTitle" class="vogue-title text-3xl sm:text-4xl font-black uppercase leading-tight text-white">Title</h2>
+                        <p id="lightboxSubtitle" class="text-vogueAccent font-semibold text-xs tracking-wider">Subtitle</p>
+                        <p id="lightboxCaption" class="text-stone-300 text-xs leading-relaxed pt-3 border-t border-white/10">Caption</p>
+                    </div>
+                    <div class="flex items-center justify-between pt-6 border-t border-white/10">
+                        <button id="lightboxLikeBtn" onclick="" class="flex items-center gap-2 px-6 py-3 rounded-full border border-white/20 bg-white/5 hover:bg-white/20 transition text-xs uppercase font-bold tracking-widest">
+                            <i id="lightboxLikeIcon" class="fa-regular fa-heart text-sm"></i>
+                            <span id="lightboxLikeCount">0 Likes</span>
+                        </button>
+                        <span class="text-[10px] uppercase tracking-widest text-stone-500 font-bold">VOGUE DTI Cover</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toastNotification" class="fixed bottom-8 right-8 z-50 hidden bg-white text-black px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 border border-stone-200 transition-all duration-300 transform translate-y-4">
+        <span id="toastMessage" class="text-xs font-bold uppercase tracking-wider">Updated successfully!</span>
+    </div>
+
+    <!-- LOCAL WEB STORAGE (LOCALSTORAGE) DATA PERSISTENCE SCRIPT -->
+    <script>
+        const FORMSPREE_ENDPOINT = "https://formspree.io/f/xaeezlrn";
+        window.SECRET_PIN = "NAREK@_!!";
+        window.isAdmin = false;
+
+        window.currentAppBase64 = "";
+        window.currentPostBase64 = "";
+        window.currentEditorModelBase64 = "";
+
+        // Sample Seeds if LocalStorage is Empty
+        const defaultThemes = [
+            "Met Gala",
+            "High Fashion",
+            "Cyberpunk",
+            "Gothic Glam",
+            "Pastel Royalty",
+            "Slay of the Day"
+        ];
+
+        const defaultEditorialPosts = [
+            {
+                id: "seed_1",
+                title: "MET GALA: CELESTIAL SLAY",
+                subtitle: "Styled by @LanaDTI_Official",
+                tag: "Met Gala",
+                imageUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1200&q=80",
+                caption: "An ethereal display of gilded corsets and luminescent stardust wings. The DTI runway reaches unprecedented heights of digital haute couture.",
+                likes: 342,
+                isHero: true,
+                date: "NOV 2026"
+            },
+            {
+                id: "seed_2",
+                title: "NEON CYBER VAMP",
+                subtitle: "Styled by @RobloxVogueKing",
+                tag: "Cyberpunk",
+                imageUrl: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=80",
+                caption: "Blending futuristic cybernetics with dark gothic lace. A masterclass in layer stacking and monochrome contrast.",
+                likes: 189,
+                isHero: false,
+                date: "NOV 2026"
+            },
+            {
+                id: "seed_3",
+                title: "PASTEL PRINCESS ROYALTY",
+                subtitle: "Styled by @CoquetteStar",
+                tag: "Pastel Royalty",
+                imageUrl: "https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=800&q=80",
+                caption: "Soft tulle cascades, pearl headpieces, and custom hair bows defining the 2026 Roblox romantic look.",
+                likes: 275,
+                isHero: false,
+                date: "NOV 2026"
+            }
+        ];
+
+        const defaultRunwayPhotos = [
+            {
+                id: "seed_101",
+                title: "Gothic Glamour Queen",
+                theme: "Gothic Glam",
+                model: "@DarkVogue_X",
+                imageUrl: "https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=600&q=80",
+                likes: 95
+            },
+            {
+                id: "seed_102",
+                title: "Futuristic Horizon",
+                theme: "Cyberpunk",
+                model: "@CyberDTI",
+                imageUrl: "https://images.unsplash.com/photo-1496747611176-843222e1e57c?auto=format&fit=crop&w=600&q=80",
+                likes: 142
+            },
+            {
+                id: "seed_103",
+                title: "Met Gala Gold Standard",
+                theme: "Slay of the Day",
+                model: "@GoldRobloxia",
+                imageUrl: "https://images.unsplash.com/photo-1469334031218-e382a71b716b?auto=format&fit=crop&w=600&q=80",
+                likes: 210
+            }
+        ];
+
+        const defaultModelsList = [
+            {
+                id: "seed_201",
+                username: "LanaDTI_Official",
+                outfitTitle: "Celestial Empress",
+                theme: "Met Gala",
+                rank: "Fashion Goddess",
+                imageUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80",
+                bio: "5-Star Runway Icon specializing in avant-garde layering and high-contrast color palettes.",
+                status: "Approved"
+            },
+            {
+                id: "seed_202",
+                username: "CoquetteStar",
+                outfitTitle: "Soft Pearl Fantasy",
+                theme: "Pastel Royalty",
+                rank: "Runway Queen",
+                imageUrl: "https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=600&q=80",
+                bio: "Creating dreamy aesthetic avatars with customized bows, parasols, and vintage heels.",
+                status: "Approved"
+            }
+        ];
+
+        // Storage Utilities
+        function getStorage(key, fallback) {
+            try {
+                const item = localStorage.getItem(`vogue_dti_${key}`);
+                return item ? JSON.parse(item) : fallback;
+            } catch(e) {
+                return fallback;
+            }
+        }
+
+        function setStorage(key, value) {
+            try {
+                localStorage.setItem(`vogue_dti_${key}`, JSON.stringify(value));
+            } catch(e) {
+                console.warn("Storage write quota or restriction encountered", e);
+            }
+        }
+
+        // Initialize State
+        window.themesList = getStorage('themes', defaultThemes);
+        window.editorialPosts = getStorage('editorialPosts', defaultEditorialPosts);
+        window.runwayPhotos = getStorage('runwayPhotos', defaultRunwayPhotos);
+        window.modelsList = getStorage('modelsList', defaultModelsList);
+        window.userLikes = getStorage('userLikes', {});
+
+        // Save State & Refresh UI
+        function saveAndRenderAll() {
+            setStorage('themes', window.themesList);
+            setStorage('editorialPosts', window.editorialPosts);
+            setStorage('runwayPhotos', window.runwayPhotos);
+            setStorage('modelsList', window.modelsList);
+            setStorage('userLikes', window.userLikes);
+
+            renderThemeSelects();
+            renderEditorial();
+            renderRunway('ALL');
+            renderModels();
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('yearSpan').textContent = new Date().getFullYear();
+            initGlitterCanvas();
+            saveAndRenderAll();
+        });
+
+        // Navigation
+        function showSection(sectionName) {
+            const sections = ['editorial', 'runway', 'application', 'models'];
+            sections.forEach(sec => {
+                const el = document.getElementById(`section-${sec}`);
+                const navLink = document.getElementById(`nav-${sec}`);
+                if (el) {
+                    if (sec === sectionName) {
+                        el.classList.remove('hidden');
+                    } else {
+                        el.classList.add('hidden');
+                    }
+                }
+                if (navLink) {
+                    if (sec === sectionName) {
+                        navLink.classList.add('text-white', 'font-bold', 'border-b-2', 'border-white', 'pb-1');
+                        navLink.classList.remove('text-stone-400');
+                    } else {
+                        navLink.classList.remove('text-white', 'font-bold', 'border-b-2', 'border-white', 'pb-1');
+                        navLink.classList.add('text-stone-400');
+                    }
+                }
+            });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            if (menu) menu.classList.toggle('hidden');
+        }
+
+        function renderThemeSelects() {
+            const themes = window.themesList || [];
+
+            const editorialTagFilter = document.getElementById('editorialTagFilter');
+            if (editorialTagFilter) {
+                editorialTagFilter.innerHTML = `<option value="ALL">All Vogue Covers</option>` + 
+                    themes.map(t => `<option value="${t}">${t}</option>`).join('');
+            }
+
+            const postTag = document.getElementById('postTag');
+            if (postTag) {
+                postTag.innerHTML = themes.map(t => `<option value="${t}">${t}</option>`).join('');
+            }
+
+            const appTheme = document.getElementById('appTheme');
+            if (appTheme) {
+                appTheme.innerHTML = themes.map(t => `<option value="${t}">${t}</option>`).join('');
+            }
+
+            const editorModelTheme = document.getElementById('editorModelTheme');
+            if (editorModelTheme) {
+                editorModelTheme.innerHTML = themes.map(t => `<option value="${t}">${t}</option>`).join('');
+            }
+
+            const runwayFilters = document.getElementById('runwayFilters');
+            if (runwayFilters) {
+                runwayFilters.innerHTML = `
+                    <button onclick="filterRunway('ALL', this)" class="runway-filter-btn px-5 py-2 rounded-full text-xs uppercase font-bold tracking-widest bg-white text-black transition">All Looks</button>
+                    ${themes.map(t => `
+                        <button onclick="filterRunway('${t}', this)" class="runway-filter-btn px-5 py-2 rounded-full text-xs uppercase font-bold tracking-widest bg-white/5 text-stone-300 hover:bg-white/15 border border-white/10 transition">${t}</button>
+                    `).join('')}
+                `;
+            }
+        }
+
+        // Admin Auth
+        function openAdminModal() {
+            if (window.isAdmin) {
+                openNewPostModal();
+            } else {
+                document.getElementById('pinError').classList.add('hidden');
+                document.getElementById('adminPinInput').value = '';
+                document.getElementById('adminPinModal').classList.remove('hidden');
+            }
+        }
+        function closeAdminModal() {
+            document.getElementById('adminPinModal').classList.add('hidden');
+        }
+        function handleAdminLogin(e) {
+            e.preventDefault();
+            const pin = document.getElementById('adminPinInput').value;
+            if (pin === window.SECRET_PIN) {
+                window.isAdmin = true;
+                closeAdminModal();
+                updateAdminState();
+                showToast('Editor Passcode Unlocked!');
+            } else {
+                document.getElementById('pinError').textContent = 'Incorrect passcode provided.';
+                document.getElementById('pinError').classList.remove('hidden');
+            }
+        }
+        function logoutAdmin() {
+            window.isAdmin = false;
+            updateAdminState();
+            showToast('Passcode Locked.');
+        }
+
+        function updateAdminState() {
+            const badge = document.getElementById('adminBadge');
+            const banner = document.getElementById('adminBanner');
+            const btnText = document.getElementById('adminBtnText');
+            const addModelBtn = document.getElementById('addModelEditorBtn');
+
+            if (window.isAdmin) {
+                badge.classList.remove('hidden');
+                banner.classList.remove('hidden');
+                if (addModelBtn) addModelBtn.classList.remove('hidden');
+                btnText.textContent = 'Create Vogue Post';
+            } else {
+                badge.classList.add('hidden');
+                banner.classList.add('hidden');
+                if (addModelBtn) addModelBtn.classList.add('hidden');
+                btnText.textContent = 'Editor-In-Chief Mode';
+            }
+            renderEditorial();
+            renderRunway('ALL');
+            renderModels();
+        }
+
+        // Admin Modals
+        function openAddThemeModal() {
+            if (!window.isAdmin) { openAdminModal(); return; }
+            document.getElementById('newThemeModal').classList.remove('hidden');
+        }
+        function closeAddThemeModal() {
+            document.getElementById('newThemeModal').classList.add('hidden');
+        }
+        function handleCreateTheme(e) {
+            e.preventDefault();
+            const val = document.getElementById('newThemeInput').value.trim();
+            if (val && !window.themesList.includes(val)) {
+                window.themesList.push(val);
+                document.getElementById('newThemeInput').value = '';
+                closeAddThemeModal();
+                saveAndRenderAll();
+                showToast(`New Theme "${val}" Added!`);
+            }
+        }
+
+        function openNewPostModal() {
+            if (!window.isAdmin) { openAdminModal(); return; }
+            document.getElementById('newPostModal').classList.remove('hidden');
+        }
+        function closeNewPostModal() {
+            document.getElementById('newPostModal').classList.add('hidden');
+        }
+
+        function openAddModelModal() {
+            if (!window.isAdmin) { openAdminModal(); return; }
+            document.getElementById('newModelModal').classList.remove('hidden');
+        }
+        function closeAddModelModal() {
+            document.getElementById('newModelModal').classList.add('hidden');
+        }
+
+        // File Uploader Previews
+        function previewUploadedImage(inputEl, labelId, previewImgId, previewContainerId) {
+            const file = inputEl.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64Url = e.target.result;
+                document.getElementById(previewImgId).src = base64Url;
+                document.getElementById(previewContainerId).classList.remove('hidden');
+                document.getElementById(labelId).textContent = `Selected: ${file.name}`;
+
+                if (inputEl.id === 'appFileInput') {
+                    window.currentAppBase64 = base64Url;
+                } else if (inputEl.id === 'postFileInput') {
+                    window.currentPostBase64 = base64Url;
+                } else if (inputEl.id === 'editorModelFileInput') {
+                    window.currentEditorModelBase64 = base64Url;
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Action Handlers
+        function handleCreatePost(e) {
+            e.preventDefault();
+            if (!window.currentPostBase64) {
+                showToast('Please select an outfit image from your device.');
+                return;
+            }
+
+            const isHero = document.getElementById('postIsHero').value === 'true';
+
+            if (isHero) {
+                window.editorialPosts.forEach(p => p.isHero = false);
+            }
+
+            const newPost = {
+                id: 'post_' + Date.now(),
+                title: document.getElementById('postTitle').value.trim(),
+                subtitle: document.getElementById('postSubtitle').value.trim(),
+                tag: document.getElementById('postTag').value,
+                imageUrl: window.currentPostBase64,
+                caption: document.getElementById('postCaption').value.trim() || "Official Vogue Roblox DTI feature.",
+                likes: 0,
+                isHero: isHero,
+                date: "NOV 2026"
+            };
+
+            window.editorialPosts.unshift(newPost);
+
+            closeNewPostModal();
+            document.getElementById('postPreviewContainer').classList.add('hidden');
+            document.getElementById('postFileLabel').textContent = "Tap to browse gallery";
+            window.currentPostBase64 = "";
+
+            saveAndRenderAll();
+            showToast('Published Live to Vogue DTI!');
+        }
+
+        function handleEditorAddModel(e) {
+            e.preventDefault();
+            if (!window.currentEditorModelBase64) {
+                showToast('Please select a photo for the model.');
+                return;
+            }
+
+            const usernameVal = document.getElementById('editorModelUsername').value.trim();
+            const newModel = {
+                id: 'model_' + Date.now(),
+                username: usernameVal,
+                outfitTitle: document.getElementById('editorModelOutfitTitle').value.trim(),
+                theme: document.getElementById('editorModelTheme').value,
+                rank: document.getElementById('editorModelRank').value,
+                imageUrl: window.currentEditorModelBase64,
+                bio: document.getElementById('editorModelBio').value.trim() || "Verified Vogue Top Model.",
+                status: "Approved"
+            };
+
+            window.modelsList.unshift(newModel);
+
+            document.getElementById('editorModelPreviewContainer').classList.add('hidden');
+            document.getElementById('editorModelFileLabel').textContent = "Tap to browse gallery";
+            window.currentEditorModelBase64 = "";
+            closeAddModelModal();
+
+            saveAndRenderAll();
+            showToast('Verified Model Added!');
+            showSection('models');
+        }
+
+        // Model Application Submission Flow (Formspree + LocalStorage)
+        async function handleModelSubmit(event) {
+            event.preventDefault();
+            if (!window.currentAppBase64) {
+                showToast('Please select an outfit photo from your gallery.');
+                return;
+            }
+
+            const btn = document.getElementById('appSubmitBtn');
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Submitting...`;
+            btn.disabled = true;
+
+            const usernameVal = document.getElementById('appUsername').value.trim();
+            const outfitTitleVal = document.getElementById('appOutfitTitle').value.trim();
+            const themeVal = document.getElementById('appTheme').value;
+            const rankVal = document.getElementById('appRank').value;
+            const bioVal = document.getElementById('appBio').value.trim() || "Roblox DTI Runway Model.";
+
+            const newModel = {
+                id: 'model_' + Date.now(),
+                username: usernameVal,
+                outfitTitle: outfitTitleVal,
+                theme: themeVal,
+                rank: rankVal,
+                imageUrl: window.currentAppBase64,
+                bio: bioVal,
+                status: "Approved"
+            };
+
+            const newRunway = {
+                id: 'runway_' + (Date.now() + 1),
+                title: outfitTitleVal,
+                theme: themeVal,
+                model: `@${usernameVal}`,
+                imageUrl: window.currentAppBase64,
+                likes: 1
+            };
+
+            // 1. Save to Local Web Storage for Immediate UI rendering
+            window.modelsList.unshift(newModel);
+            window.runwayPhotos.unshift(newRunway);
+            saveAndRenderAll();
+
+            // 2. Dispatch Email via Formspree Endpoint
+            try {
+                await fetch(FORMSPREE_ENDPOINT, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        "Roblox Username": usernameVal,
+                        "Outfit Title": outfitTitleVal,
+                        "Style Theme": themeVal,
+                        "DTI Rank": rankVal,
+                        "Model Statement": bioVal,
+                        "Outfit Image Base64": window.currentAppBase64
+                    })
+                });
+            } catch(e) {
+                console.warn("Formspree dispatch notice:", e);
+            }
+
+            document.getElementById('modelAppForm').reset();
+            document.getElementById('appPreviewContainer').classList.add('hidden');
+            document.getElementById('appFileLabel').textContent = "Tap to choose photo from gallery";
+            window.currentAppBase64 = "";
+
+            btn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> Submit Model Application`;
+            btn.disabled = false;
+
+            showToast('Application Published Live & Emailed!');
+            showSection('models');
+        }
+
+        // Deletion Methods
+        function deletePost(id) {
+            if (!window.isAdmin) return;
+            window.editorialPosts = window.editorialPosts.filter(p => String(p.id) !== String(id));
+            saveAndRenderAll();
+            showToast('Editorial cover removed.');
+        }
+
+        function deleteRunwayItem(id) {
+            if (!window.isAdmin) return;
+            window.runwayPhotos = window.runwayPhotos.filter(r => String(r.id) !== String(id));
+            saveAndRenderAll();
+            showToast('Runway look removed.');
+        }
+
+        function removeModel(id) {
+            if (!window.isAdmin) return;
+            window.modelsList = window.modelsList.filter(m => String(m.id) !== String(id));
+            saveAndRenderAll();
+            showToast('Model removed.');
+        }
+
+        // Like Handlers
+        function toggleEditorialLike(id) {
+            const post = window.editorialPosts.find(p => String(p.id) === String(id));
+            if (post) {
+                const key = `post_${post.id}`;
+                const hasLiked = !!window.userLikes[key];
+                const currentLikes = post.likes || 0;
+
+                if (hasLiked) {
+                    delete window.userLikes[key];
+                    post.likes = Math.max(0, currentLikes - 1);
+                } else {
+                    window.userLikes[key] = true;
+                    post.likes = currentLikes + 1;
+                }
+                saveAndRenderAll();
+            }
+        }
+
+        function toggleRunwayLike(id) {
+            const item = window.runwayPhotos.find(r => String(r.id) === String(id));
+            if (item) {
+                const key = `runway_${item.id}`;
+                const hasLiked = !!window.userLikes[key];
+                const currentLikes = item.likes || 0;
+
+                if (hasLiked) {
+                    delete window.userLikes[key];
+                    item.likes = Math.max(0, currentLikes - 1);
+                } else {
+                    window.userLikes[key] = true;
+                    item.likes = currentLikes + 1;
+                }
+                saveAndRenderAll();
+            }
+        }
+
+        // Rendering Engine
+        function renderEditorial() {
+            const posts = window.editorialPosts || [];
+            const heroContainer = document.getElementById('heroCoverContainer');
+            const gridContainer = document.getElementById('editorialGrid');
+            const filterTagSelect = document.getElementById('editorialTagFilter');
+            const filterTag = filterTagSelect ? filterTagSelect.value : 'ALL';
+
+            let filtered = posts;
+            if (filterTag && filterTag !== 'ALL') {
+                filtered = posts.filter(p => p.tag === filterTag);
+            }
+
+            const heroPost = posts.find(p => p.isHero) || posts[0];
+            if (heroPost && (filterTag === 'ALL' || heroPost.tag === filterTag)) {
+                const isLiked = !!window.userLikes[`post_${heroPost.id}`];
+                heroContainer.classList.remove('hidden');
+                heroContainer.innerHTML = `
+                    <div class="grid grid-cols-1 lg:grid-cols-12 min-h-[460px]">
+                        <div class="lg:col-span-7 relative h-72 lg:h-full overflow-hidden cursor-pointer group" onclick="openCoverLightbox('${heroPost.id}')">
+                            <img src="${heroPost.imageUrl}" alt="${heroPost.title}" class="w-full h-full object-cover transform group-hover:scale-105 transition duration-700">
+                            <div class="absolute top-4 left-4 bg-black/70 backdrop-blur-md text-white border border-white/20 px-3.5 py-1 rounded-full text-[10px] uppercase font-bold tracking-widest">
+                                Main Hero Cover
+                            </div>
+                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition duration-300 flex items-center justify-center">
+                                <span class="bg-black/90 backdrop-blur-md border border-white/40 text-white px-5 py-2.5 rounded-full text-xs uppercase font-bold tracking-widest shadow-2xl flex items-center gap-2">
+                                    <i class="fa-solid fa-expand text-sm"></i> View Cover
+                                </span>
+                            </div>
+                        </div>
+                        <div class="lg:col-span-5 p-8 sm:p-10 flex flex-col justify-between space-y-6 bg-gradient-to-b lg:bg-gradient-to-r from-stone-950/90 to-black">
+                            <div class="space-y-3 cursor-pointer" onclick="openCoverLightbox('${heroPost.id}')">
+                                <div class="flex items-center gap-3">
+                                    <span class="px-3 py-1 bg-vogueAccent/20 text-vogueAccent border border-vogueAccent/40 rounded-full text-[10px] font-bold uppercase tracking-widest">${heroPost.tag}</span>
+                                    <span class="text-stone-400 text-xs font-mono">${heroPost.date || 'NOV 2026'}</span>
+                                </div>
+                                <h2 class="vogue-title text-3xl sm:text-4xl font-extrabold uppercase leading-tight text-white hover:text-vogueAccent transition">${heroPost.title}</h2>
+                                <p class="text-stone-300 font-semibold text-xs tracking-wider">${heroPost.subtitle}</p>
+                                <p class="text-stone-400 text-xs leading-relaxed pt-2 border-t border-white/10">${heroPost.caption}</p>
+                            </div>
+                            <div class="flex items-center justify-between pt-4">
+                                <button onclick="toggleEditorialLike('${heroPost.id}')" class="flex items-center gap-2 px-5 py-2.5 rounded-full border border-white/20 bg-white/5 hover:bg-white/15 transition text-xs uppercase font-bold tracking-widest">
+                                    <i class="fa-${isLiked ? 'solid text-rose-500' : 'regular text-stone-300'} fa-heart text-sm"></i>
+                                    <span>${heroPost.likes || 0} Likes</span>
+                                </button>
+                                ${window.isAdmin ? `<button onclick="deletePost('${heroPost.id}')" class="text-stone-400 hover:text-red-400 text-xs uppercase font-bold tracking-wider"><i class="fa-solid fa-trash mr-1"></i> Delete</button>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                heroContainer.classList.add('hidden');
+            }
+
+            const gridPosts = filtered.filter(p => p !== heroPost || filterTag !== 'ALL');
+            gridContainer.innerHTML = gridPosts.map(post => {
+                const isLiked = !!window.userLikes[`post_${post.id}`];
+                return `
+                <div class="glass-card rounded-2xl overflow-hidden flex flex-col justify-between transition duration-500 hover:-translate-y-1 relative group cursor-pointer" onclick="openCoverLightbox('${post.id}')">
+                    <div>
+                        <div class="relative h-80 overflow-hidden">
+                            <img src="${post.imageUrl}" alt="${post.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                            <div class="absolute top-3 left-3 bg-black/70 backdrop-blur-md px-3 py-1 rounded-full text-[9px] uppercase font-bold tracking-widest border border-white/15">
+                                ${post.tag}
+                            </div>
+                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition duration-300 flex items-center justify-center">
+                                <span class="bg-black/90 backdrop-blur-md border border-white/40 text-white px-4 py-2 rounded-full text-xs uppercase font-bold tracking-widest shadow-2xl flex items-center gap-2">
+                                    <i class="fa-solid fa-expand text-xs"></i> View Cover
+                                </span>
+                            </div>
+                        </div>
+                        <div class="p-6 space-y-3">
+                            <h3 class="vogue-title text-xl font-bold uppercase tracking-wider text-white group-hover:text-vogueAccent transition">${post.title}</h3>
+                            <p class="text-stone-400 text-xs font-medium">${post.subtitle}</p>
+                            <p class="text-stone-300 text-xs leading-relaxed">${post.caption}</p>
+                        </div>
+                    </div>
+                    <div class="p-6 pt-0 flex items-center justify-between border-t border-white/10 mt-4">
+                        <button onclick="event.stopPropagation(); toggleEditorialLike('${post.id}')" class="flex items-center gap-2 text-xs font-bold text-stone-300 hover:text-white transition">
+                            <i class="fa-${isLiked ? 'solid text-rose-500' : 'regular'} fa-heart text-sm"></i>
+                            <span>${post.likes || 0}</span>
+                        </button>
+                        ${window.isAdmin ? `<button onclick="event.stopPropagation(); deletePost('${post.id}')" class="text-stone-500 hover:text-red-400 text-xs font-bold uppercase"><i class="fa-solid fa-trash"></i></button>` : ''}
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
+
+        function filterEditorialFeed() {
+            renderEditorial();
+        }
+
+        function filterRunway(category, btnEl) {
+            document.querySelectorAll('.runway-filter-btn').forEach(btn => {
+                btn.classList.remove('bg-white', 'text-black');
+                btn.classList.add('bg-white/5', 'text-stone-300');
+            });
+            if (btnEl) {
+                btnEl.classList.remove('bg-white/5', 'text-stone-300');
+                btnEl.classList.add('bg-white', 'text-black');
+            }
+
+            renderRunway(category);
+        }
+
+        function renderRunway(filterCategory = 'ALL') {
+            const grid = document.getElementById('runwayGrid');
+            let items = window.runwayPhotos || [];
+
+            if (filterCategory !== 'ALL') {
+                items = items.filter(r => r.theme.toLowerCase().includes(filterCategory.toLowerCase()) || filterCategory.toLowerCase().includes(r.theme.toLowerCase()));
+            }
+
+            grid.innerHTML = items.map(item => {
+                const isLiked = !!window.userLikes[`runway_${item.id}`];
+                return `
+                <div class="glass-card rounded-2xl overflow-hidden group transition duration-500">
+                    <div class="relative h-72 overflow-hidden">
+                        <img src="${item.imageUrl}" alt="${item.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        <div class="absolute bottom-3 left-3 right-3 bg-black/80 backdrop-blur-md p-2.5 rounded-xl border border-white/10 flex justify-between items-center">
+                            <span class="text-[10px] uppercase font-bold tracking-wider text-vogueAccent truncate">${item.model}</span>
+                            <span class="text-[9px] uppercase font-semibold text-stone-300 bg-white/10 px-2 py-0.5 rounded-full">${item.theme}</span>
+                        </div>
+                    </div>
+                    <div class="p-4 flex items-center justify-between border-t border-white/10">
+                        <span class="text-xs font-bold uppercase tracking-wider text-white truncate max-w-[60%]">${item.title}</span>
+                        <div class="flex items-center gap-3">
+                            <button onclick="toggleRunwayLike('${item.id}')" class="flex items-center gap-1.5 text-xs text-stone-300 hover:text-white">
+                                <i class="fa-${isLiked ? 'solid text-rose-500' : 'regular'} fa-heart"></i>
+                                <span class="font-bold">${item.likes || 0}</span>
+                            </button>
+                            ${window.isAdmin ? `<button onclick="deleteRunwayItem('${item.id}')" class="text-stone-500 hover:text-red-400 text-xs"><i class="fa-solid fa-trash"></i></button>` : ''}
+                        </div>
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
+
+        function renderModels() {
+            const grid = document.getElementById('modelsGrid');
+            const models = window.modelsList || [];
+            const countText = document.getElementById('modelCountText');
+            countText.textContent = `${models.length} Models Enrolled`;
+
+            grid.innerHTML = models.map(m => `
+                <div class="glass-card rounded-3xl p-6 flex flex-col justify-between space-y-4 relative group hover:border-white/40 transition duration-500">
+                    <div class="space-y-4">
+                        <div class="relative h-64 rounded-2xl overflow-hidden border border-white/10">
+                            <img src="${m.imageUrl}" alt="${m.username}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                            <div class="absolute top-3 right-3 bg-black/80 backdrop-blur-md text-stone-200 border border-white/30 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">
+                                ${m.rank}
+                            </div>
+                        </div>
+                        <div>
+                            <span class="text-[10px] uppercase font-bold tracking-[0.2em] text-vogueAccent block">${m.theme || 'Runway Icon'}</span>
+                            <h3 class="vogue-title text-2xl font-bold uppercase tracking-wider text-white">@${m.username}</h3>
+                            <p class="text-xs text-stone-300 font-semibold mt-0.5">Look: "${m.outfitTitle || 'Featured Ensemble'}"</p>
+                        </div>
+                        <p class="text-xs text-stone-400 leading-relaxed border-t border-white/10 pt-3">${m.bio}</p>
+                    </div>
+                    
+                    <div class="pt-2 flex items-center justify-between border-t border-white/10">
+                        <span class="text-[10px] font-bold uppercase tracking-widest text-emerald-400 flex items-center gap-1">
+                            <i class="fa-solid fa-circle-check text-xs"></i> Verified Model
+                        </span>
+                        ${window.isAdmin ? `<button onclick="removeModel('${m.id}')" class="text-xs text-stone-500 hover:text-red-400 uppercase font-bold"><i class="fa-solid fa-user-xmark mr-1"></i> Remove</button>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Lightbox Handler
+        function openCoverLightbox(id) {
+            const post = window.editorialPosts.find(p => String(p.id) === String(id));
+            if (!post) return;
+
+            document.getElementById('lightboxImg').src = post.imageUrl;
+            document.getElementById('lightboxTag').textContent = post.tag;
+            document.getElementById('lightboxDate').textContent = post.date || 'NOV 2026';
+            document.getElementById('lightboxTitle').textContent = post.title;
+            document.getElementById('lightboxSubtitle').textContent = post.subtitle;
+            document.getElementById('lightboxCaption').textContent = post.caption;
+            
+            const isLiked = !!window.userLikes[`post_${post.id}`];
+            const likeIcon = document.getElementById('lightboxLikeIcon');
+            const likeBtn = document.getElementById('lightboxLikeBtn');
+            const likeCount = document.getElementById('lightboxLikeCount');
+            
+            likeCount.textContent = `${post.likes || 0} Likes`;
+            likeIcon.className = `fa-${isLiked ? 'solid text-rose-500' : 'regular text-stone-300'} fa-heart text-sm`;
+            likeBtn.onclick = function() {
+                toggleEditorialLike(post.id);
+                openCoverLightbox(post.id);
+            };
+
+            document.getElementById('coverLightboxModal').classList.remove('hidden');
+        }
+
+        function closeCoverLightbox() {
+            document.getElementById('coverLightboxModal').classList.add('hidden');
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toastNotification');
+            const msgEl = document.getElementById('toastMessage');
+            msgEl.textContent = msg;
+            toast.classList.remove('hidden', 'translate-y-4');
+            toast.classList.add('translate-y-0');
+
+            setTimeout(() => {
+                toast.classList.add('translate-y-4');
+                setTimeout(() => toast.classList.add('hidden'), 300);
+            }, 3000);
+        }
+
+        function initGlitterCanvas() {
+            const canvas = document.getElementById('glitterCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            let width = canvas.width = window.innerWidth;
+            let height = canvas.height = window.innerHeight;
+
+            window.addEventListener('resize', () => {
+                width = canvas.width = window.innerWidth;
+                height = canvas.height = window.innerHeight;
+            });
+
+            const particles = [];
+            for (let i = 0; i < 45; i++) {
+                particles.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    size: Math.random() * 2 + 0.5,
+                    alpha: Math.random(),
+                    speed: Math.random() * 0.3 + 0.1
+                });
+            }
+
+            function animateGlitter() {
+                ctx.clearRect(0, 0, width, height);
+                particles.forEach(p => {
+                    p.y -= p.speed;
+                    if (p.y < 0) p.y = height;
+                    ctx.fillStyle = `rgba(255, 255, 255, ${Math.sin(p.alpha) * 0.4 + 0.3})`;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.fill();
+                    p.alpha += 0.02;
+                });
+                requestAnimationFrame(animateGlitter);
+            }
+            animateGlitter();
+        }
+    </script>
+</body>
+</html>
